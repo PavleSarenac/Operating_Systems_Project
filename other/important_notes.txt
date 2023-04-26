@@ -1,0 +1,52 @@
+* u terminal u clion-u kada unesemo "make qemu", pokrecemo emulator ali nezavisno od razvojnog okruzenja clion, pa se tada ne vrsi baferisanje unetih karaktera (ne ceka
+se korisnik da unese enter kako bi signalizirao kraj unosa), vec se karakteri odmah obradjuju pri unosu - OVO MOGU DA TRAZE NA ODBRANI PROJEKTA
+
+* kod debagovanja GDB tab je DOSTA KORISTAN (npr. preko njega mozemo da vidimo vrednosti registara nase masine) - kucaj "help" pa se snalazi, a moze i da se unese
+"apropos ____", gde umesto prazne linije mogu da unesem sa cim hocu da baratam pa ce se ispisati moguce akcije vezane za to; npr. ako unesem "apropos register", bice
+izlistane sve akcije vezane za registre
+
+* npr. kada se u gdb unese "info registers", bice izlistane vrednosti svih registara, a mozemo da unesemo i npr. "help info registers" da bismo videli tekstualni opis ove akcije
+
+* unos "help x" u gdb je korisna stvar - npr. unosom "x/10ig $pc" dobijamo ispis 10 instrukcija u assembly formatu (umesto u masinskom zapisu) pocevsi od adrese koja se 
+trenutno nalazi u pc registru
+
+* unos "display /1i $pc" obezbedjuje da se, svaki put kada se zaustavi program, ispise jedna instrukcija pocevsi od adrese koja se nalazi u registru pc; generalno display
+tome sluzi, da kazemo sta zelimo da se ispisuje pri svakom zaustavljanju programa
+
+* unos "next" u gdb je ekvivalentan kliku na "step over" u clion-u (odnosi se na jednu liniju koda u nasem programu) 
+* unos "nexti" u gdb - ista prica, ali se odnosi na jednu masinsku instrukciju
+* unos "step" u gdb je ekvivalentan kliku na "step into" u clion-u (odnosi se na jednu liniju koda u nasem programu) 
+* unos "stepi" u gdb - ista prica, ali se odnosi na jednu masinsku instrukciju
+
+* unos "continue" u gdb je ekvivalent kliku na "resume program" u clion-u ---> rezultat ove akcije je izvrsavanje programa do narednog breakpoint-a, kada ce se program 
+ponovo zaustaviti
+
+* MakeFile tab sa strane:
+	- clean: vraca projekat u pocetno stanje pre bilo kakvog prevodjenja
+	- all: prevodi nas izvorni kod
+	- qemu: pokrece (a pre toga i prevodi po potrebi) nas program
+	- qemu-gdb: pokrece nas program u debug rezimu (potrebno je i podesiti rucno konfiguraciju na Remote Debug i zatim kliknuti na "bubicu" kako bi se pokrenulo 
+	debagovanje)
+
+- alokacija memorije:
+	* problem eksterne fragmentacije sam ublazio tako sto, kada se slobodan fragment zauzme, i preostane manji fragment, ukoliko je taj preostali manji fragment manji
+	ili jednak strukturi za ulancavanje, onda ga necu evidentirati kao slobodan fragment uopste (necu ga umetati u strukturu za ulancavanje slobodnih fragmenata)
+	* PITANJE: sta raditi ako se funkciji mem_free prosledi pokazivac koji nije vratila funkcija mem_alloc - kako obraditi ovu situaciju???
+	* PITANJE: da li destruktor treba da bude privatan u klasi MemoryAllocator? probao sam, ali se onda ne prevodi kod???
+
+	
+- Riscv - korisnicki rezim.pdf:
+	
+- random cinjenice:
+	* ako funkciju definisemo kao inline, onda se na mestima njenog poziva NE GENERISU masinske instrukcije koje vrse poziv ove funkcije, vec ce sam kod funkcije
+	biti ugradjen na tim mestima - ovo znaci da se NECE UPISIVATI povratna adresa u registar ra na RiscV arhitekturi
+	* NE GLEDAJ NIKAKO VREDNOSTI PROMENLJIVIH U DEBAGERU, ISPISUJ IH BOLJE, POSTO SU LOSE VREDNOSTI U DEBAGERU
+	* OBAVEZNO GLEDAJ I KERNEL.ASM FAJL - MNOGO JE KORISTAN
+	
+- random pitanja:
+	* za stavku 2) iz predloga redosleda izrade projekta, kaze "...samo prenos argumenata...", mislim da tu ne treba nikakvi argumenti da se prenose jer prekidna rutina
+	(supervisorTrap) ne prima argumente?
+	
+- STA TREBA ISPRAVITI U PROJEKTU:
+	* NAPRAVI C FUNKCIJU KOJA PRIMA PROIZVOLJNE ARGUMENTE I KOJU CE DA POZIVAJU SVE F-JE IZ C API
+		- ova funkcija treba da pripremi parametre sistemskog poziva i da izvrsi ecall
